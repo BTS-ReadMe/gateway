@@ -1,0 +1,21 @@
+server:
+  port: 8000
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://10.10.10.158:8761/eureka
+    instance:
+      instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+spring:
+  application:
+    name: gateway-service
+#  cloud:
+#    gateway:
+#      routes:
+#        - id:
+#          uri:
+#          predicates:
