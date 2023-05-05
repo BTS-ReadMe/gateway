@@ -21,3 +21,29 @@ spring:
           uri: lb://NOVELS-SERVICE
           predicates:
             - Path=/novels-service/**
+          filters:
+            - StripPrefix=1
+        - id: users-service
+          uri: lb://USERS-SERVICE
+          predicates:
+            - Path=/users-service/**
+          filters:
+            - StripPrefix=1
+        - id: payments-service
+          uri: lb://PAYMENTS-SERVICE
+          predicates:
+            - Path=/payments-service/**
+          filters:
+            - StripPrefix=1
+        - id: utils-service
+          uri: lb://UTILS-SERVICE
+          predicates:
+            - Path=/utils-service/**
+          filters:
+            - StripPrefix=1
+        - id: config-server
+          uri: lb://CONFIG-SERVER
+          predicates:
+            - Path=/config-server/**
+          filters:
+            - StripPrefix=1
