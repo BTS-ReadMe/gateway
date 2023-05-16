@@ -49,7 +49,7 @@ jobs:
           mkdir -p ./src/main/resources
           cd ./src/main/resources
           touch ./application.yml
-          echo "${{ secrets.PROPERTIES_DEV }}" > ./application.yml
+          echo '${{ secrets.PROPERTIES_DEV }}' > ./application.yml
       shell: bash
 
     ## create application-prod.yml
@@ -59,7 +59,7 @@ jobs:
           mkdir -p ./src/main/resources
           cd ./src/main/resources
           touch ./application.yml
-          echo "${{ secrets.PROPERTIES_PROD }}" > ./application.yml
+          echo '${{ secrets.PROPERTIES_PROD }}' > ./application.yml
       shell: bash
 
     ## grant execute permission for gradlew
