@@ -1,0 +1,105 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+
+name: CI/CD
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+
+permissions:  
+  contents: read
+
+jobs:
+  CI-CD:
+    runs-on: ubuntu-latest
+    steps:
+    
+    ## jdk setting
+    - uses: actions/checkout@v3
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        
+    ## gradle caching - 빌드 시간 향상
+    - name: Gradle Caching
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+        
+    
+    ## create application-dev.yml
+    - name: make application-dev.yml
+      if: contains(github.ref, 'develop')
+      run: |
+          mkdir ./src/main/resources
+          cd ./src/main/resources
+          touch ./application.yml
+          echo "${{ secrets.PROPERTIES_DEV }}" > ./application.yml
+      shell: bash
+
+    ## create application-prod.yml
+    - name: make application-prod.yml
+      if: contains(github.ref, 'main')
+      run: |
+          mkdir ./src/main/resources
+          cd ./src/main/resources
+          touch ./application.yml
+          echo "${{ secrets.PROPERTIES_PROD }}" > ./application.yml
+      shell: bash
+
+    ## grant execute permission for gradlew
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    ## gradle build
+    - name: Build with Gradle
+      run: ./gradlew build -x test
+      
+    ## docker build & push to production
+    - name: Docker build & push to prod
+      if: contains(github.ref, 'main')
+      run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -f Dockerfile-prod -t ${{ secrets.DOCKER_REPO }}/gateway-prod .
+          docker push ${{ secrets.DOCKER_REPO }}/gateway-prod
+
+    ## docker build & push to develop
+    - name: Docker build & push to dev
+      if: contains(github.ref, 'develop')
+      run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -f Dockerfile-dev -t ${{ secrets.DOCKER_REPO }}/gateway-dev .
+          docker push ${{ secrets.DOCKER_REPO }}/gateway-dev
+          
+    ## deploy to production
+    - name: Deploy to prod
+      uses: appleboy/ssh-action@master
+      id: deploy-prod
+      if: contains(github.ref, 'main')
+      with:
+        host: ${{ secrets.HOST_EC2 }} # EC2 퍼블릭 IPv4 DNS
+        username: ubuntu
+        key: ${{ secrets.PRIVATE_KEY }}
+        envs: GITHUB_SHA
+        script: |
+          sudo docker ps
+          sudo docker stop gateway-prod
+          sudo docker rm gateway-prod
+          sudo docker pull ${{ secrets.DOCKER_USERNAME }}/gateway-prod
+          sudo docker run -d --name discovery-prod -p 8761:8761 --network bts-network ${{ secrets.DOCKER_USERNAME }}/gateway-prod
+          sudo docker image prune -f
