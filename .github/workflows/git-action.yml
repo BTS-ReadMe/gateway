@@ -46,7 +46,7 @@ jobs:
     - name: make application-dev.yml
       if: contains(github.ref, 'develop')
       run: |
-          mkdir ./src/main/resources
+          mkdir -p ./src/main/resources
           cd ./src/main/resources
           touch ./application.yml
           echo "${{ secrets.PROPERTIES_DEV }}" > ./application.yml
@@ -56,7 +56,7 @@ jobs:
     - name: make application-prod.yml
       if: contains(github.ref, 'main')
       run: |
-          mkdir ./src/main/resources
+          mkdir -p ./src/main/resources
           cd ./src/main/resources
           touch ./application.yml
           echo "${{ secrets.PROPERTIES_PROD }}" > ./application.yml
@@ -101,5 +101,5 @@ jobs:
           sudo docker stop gateway-prod
           sudo docker rm gateway-prod
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/gateway-prod
-          sudo docker run -d --name discovery-prod -p 8761:8761 --network bts-network ${{ secrets.DOCKER_USERNAME }}/gateway-prod
+          sudo docker run -d --name gateway-prod -p 8000:8000 --network bts-network ${{ secrets.DOCKER_USERNAME }}/gateway-prod
           sudo docker image prune -f
