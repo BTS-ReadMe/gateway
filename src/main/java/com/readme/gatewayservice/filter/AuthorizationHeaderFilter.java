@@ -13,12 +13,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Component
 @Slf4j
-public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<AuthorizationHeaderFilter.Config> {
+public class AuthorizationHeaderFilter extends
+    AbstractGatewayFilterFactory<AuthorizationHeaderFilter.Config>
+    implements CorsConfigurationSource {
 
     Environment env;
 
@@ -26,6 +30,16 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         super(Config.class);
         this.env = env;
     }
+
+    @Override
+    public CorsConfiguration getCorsConfiguration(ServerWebExchange exchange) {
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin("*");
+        config.addAllowedMethod("*");
+        config.addAllowedHeader("*");
+        return config;
+    }
+
 
     public static class Config {
 
@@ -62,7 +76,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             Date exp = claims.getExpiration();
             Date now = new Date();
 
-            if (role == null || role.isEmpty() || exp == null || exp.before(now) || !role.equals("USER")) {
+            if (role == null || role.isEmpty() || exp == null || exp.before(now) || !role.equals(
+                "USER")) {
                 returnValue = false;
             }
 
@@ -70,7 +85,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             returnValue = false;
         }
 
-        return  returnValue;
+        return returnValue;
     }
 
     private Mono<Void> onError(ServerWebExchange exchange, String err, HttpStatus httpStatus) {
