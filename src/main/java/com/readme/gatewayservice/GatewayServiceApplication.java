@@ -22,6 +22,7 @@ public class GatewayServiceApplication {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
 		corsConfiguration.addAllowedHeader("*");
+		corsConfiguration.addExposedHeader("*");
 		corsConfiguration.addAllowedOrigin("https://readme.life");
 		corsConfiguration.addAllowedOrigin("http://localhost:3000");
 		corsConfiguration.addAllowedOrigin("http://43.200.189.164");

@@ -27,29 +27,6 @@ public class AuthorizationHeaderFilter extends
         this.env = env;
     }
 
-//    @Override
-//    public CorsConfiguration getCorsConfiguration(ServerWebExchange exchange) {
-//        CorsConfiguration config = new CorsConfiguration();
-//        config.setAllowedOrigins(Arrays.asList(
-//            "https://readme.life",
-//            "http://localhost:3000",
-//            "http://43.200.189.164"
-//        ));
-//        config.setAllowedMethods(Arrays.asList(
-//            HttpMethod.GET.name(),
-//            HttpMethod.POST.name(),
-//            HttpMethod.PUT.name(),
-//            HttpMethod.DELETE.name(),
-//            HttpMethod.PATCH.name(),
-//            HttpMethod.OPTIONS.name()
-//        ));
-//        config.addAllowedHeader("*");
-//        config.addExposedHeader("*");
-//        config.setAllowCredentials(true);
-//        config.setMaxAge(Duration.ofSeconds(3600));
-//        return config;
-//    }
-
 
     public static class Config {
 
@@ -79,8 +56,8 @@ public class AuthorizationHeaderFilter extends
         boolean returnValue = true;
 
         try {
-            Claims claims = Jwts.parser().setSigningKey(env.getProperty("token.secret"))
-                .parseClaimsJws(jwt).getBody();
+            String secret = env.getProperty("token.secret");
+            Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(jwt).getBody();
 
             String role = claims.get("role", String.class);
             Date exp = claims.getExpiration();
