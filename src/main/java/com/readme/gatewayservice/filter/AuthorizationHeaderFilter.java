@@ -2,6 +2,8 @@ package com.readme.gatewayservice.filter;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import java.time.Duration;
+import java.util.Arrays;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +11,7 @@ import org.apache.http.HttpHeaders;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -34,10 +37,22 @@ public class AuthorizationHeaderFilter extends
     @Override
     public CorsConfiguration getCorsConfiguration(ServerWebExchange exchange) {
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("*");
-        config.addAllowedMethod("*");
+        config.setAllowedOrigins(Arrays.asList(
+            "https://readme.life",
+            "http://localhost:3000",
+            "http://43.200.189.164"
+        ));
+        config.setAllowedMethods(Arrays.asList(
+            HttpMethod.GET.name(),
+            HttpMethod.POST.name(),
+            HttpMethod.PUT.name(),
+            HttpMethod.DELETE.name(),
+            HttpMethod.PATCH.name(),
+            HttpMethod.OPTIONS.name()
+        ));
         config.addAllowedHeader("*");
         config.addExposedHeader("*");
+        config.setMaxAge(Duration.ofSeconds(3600));
         return config;
     }
 
