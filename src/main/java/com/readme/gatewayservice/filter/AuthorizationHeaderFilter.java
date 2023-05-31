@@ -44,6 +44,8 @@ public class AuthorizationHeaderFilter extends
             String authorizationHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
             String jwt = authorizationHeader.replace("Bearer ", "");
 
+            log.info("jwt 토큰 : " + jwt);
+
             if (!isJwtValid(jwt)) {
                 return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
             }
@@ -58,8 +60,10 @@ public class AuthorizationHeaderFilter extends
         try {
             String secret = env.getProperty("token.secret");
             Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(jwt).getBody();
+            log.info("claims : " + claims.toString());
 
             String role = claims.get("role", String.class);
+            log.info("role : " + role);
             Date exp = claims.getExpiration();
             Date now = new Date();
 
@@ -69,6 +73,7 @@ public class AuthorizationHeaderFilter extends
             }
 
         } catch (Exception e) {
+            log.info("try-catch 에러 발생!");
             returnValue = false;
         }
 
