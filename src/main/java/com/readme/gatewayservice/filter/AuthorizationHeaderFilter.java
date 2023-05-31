@@ -52,6 +52,7 @@ public class AuthorizationHeaderFilter extends
         ));
         config.addAllowedHeader("*");
         config.addExposedHeader("*");
+        config.setAllowCredentials(true);
         config.setMaxAge(Duration.ofSeconds(3600));
         return config;
     }
