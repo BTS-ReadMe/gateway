@@ -37,6 +37,7 @@ public class AuthorizationHeaderFilter extends
         config.addAllowedOrigin("*");
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
+        config.addExposedHeader("*");
         return config;
     }
 
