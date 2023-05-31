@@ -21,6 +21,7 @@ public class GatewayServiceApplication {
 	public CorsConfigurationSource corsConfigurationSource() {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
+		corsConfiguration.addAllowedOriginPattern("*");
 		corsConfiguration.addAllowedHeader("*");
 		corsConfiguration.addExposedHeader("*");
 		corsConfiguration.addAllowedOrigin("https://readme.life");
