@@ -26,7 +26,7 @@ public class GatewayServiceApplication {
 		corsConfiguration.addExposedHeader("*");
 		corsConfiguration.addAllowedOrigin("https://readme.life");
 		corsConfiguration.addAllowedOrigin("http://localhost:3000");
-		corsConfiguration.addAllowedOrigin("http://43.200.189.164");
+		corsConfiguration.addAllowedOrigin("http://15.165.198.145");
 		corsConfiguration.addAllowedMethod("*");
 		corsConfiguration.setAllowCredentials(true);
 		source.registerCorsConfiguration("/**", corsConfiguration);
